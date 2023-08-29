@@ -26,6 +26,10 @@ public class PatientService {
     }
 
     public Patient getAllPatient(Integer user_id){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("PATIENT")))
+            throw new ApiException("The doctor can't add a patient");
+
         return patientRepository.getPatientById(user_id);
     }
 
@@ -33,7 +37,7 @@ public class PatientService {
         User user = authRepository.findUserById(user_id);
         Patient checkPatient = patientRepository.findPatientById(user_id);
 
-        if (user.getRole().equals("DOCTOR"))
+        if (!(user.getRole().equals("PATIENT")))
             throw new ApiException("The doctor can't add a patient");
         else if (checkPatient != null)
             throw new ApiException("This patient already complete his/her information");
@@ -60,6 +64,10 @@ public class PatientService {
     }
 
     public void updatePatient(Integer user_id, Integer patient_id,PatientDTO patientDTO){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("PATIENT")))
+            throw new ApiException("The doctor can't add a patient");
+
         Patient oldPatient = patientRepository.findPatientById(patient_id);
 
         if (oldPatient == null)
@@ -80,6 +88,10 @@ public class PatientService {
     }
 
     public void deletePatient(Integer user_id,Integer id){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("PATIENT")))
+            throw new ApiException("The doctor can't add a patient");
+
         Patient deletePatient = patientRepository.findPatientById(id);
 
         if (deletePatient == null)
@@ -95,9 +107,9 @@ public class PatientService {
 
     public void appointmentBooking(Integer user_id,Integer id){
        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("PATIENT")))
+            throw new ApiException("The doctor can't add a patient");
 
-       if (user.getRole().equals("DOCTOR"))
-           throw new ApiException("Sorry, only the patient can do this operation");
 
         Patient patient = patientRepository.findPatientById(id);
 
@@ -132,8 +144,8 @@ public class PatientService {
 
     public void assignRoomToPatient(Integer user_id,Integer room_id , Integer patient_id){
         User user = authRepository.findUserById(user_id);
-        if (user.getRole().equals("DOCTOR"))
-            throw new ApiException("Sorry, only the patient can do this operation");
+        if (!(user.getRole().equals("PATIENT")))
+            throw new ApiException("The doctor can't add a patient");
 
 
         Room room = roomRepository.findRoomById(room_id);

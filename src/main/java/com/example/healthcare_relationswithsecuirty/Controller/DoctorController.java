@@ -57,13 +57,6 @@ public class DoctorController {
         return ResponseEntity.status(200).body(new ApiResponse("The salary after bouns = "+ result));
     }
 
-    @GetMapping("/getposition/{position}")
-    public ResponseEntity getAllDoctorPosition(@PathVariable String position){
-        List<Doctor> doctors = doctorService.getAllDoctorWithPosition(position);
-
-        return ResponseEntity.status(200).body(doctors);
-    }
-
 
     @PutMapping("/deduction/{id}")
     public ResponseEntity deductionSalary(@AuthenticationPrincipal User user,@PathVariable Integer id){

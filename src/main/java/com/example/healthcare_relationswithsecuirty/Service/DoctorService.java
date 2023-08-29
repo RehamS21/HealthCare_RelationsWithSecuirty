@@ -30,6 +30,10 @@ public class DoctorService {
     }
 
     public Doctor getAllDoctor(Integer user_id){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("DOCTOR")))
+            throw new ApiException("Sorry only doctor can see this page");
+
         Doctor doctor = doctorRepository.findDoctorById(user_id);
         if (doctor == null)
             throw new ApiException("Sorry you cant see info of this doctor");
@@ -42,7 +46,7 @@ public class DoctorService {
         User user = authRepository.findUserById(user_id);
         Doctor checkDoctor = doctorRepository.findDoctorById(user_id);
 
-        if (user.getRole().equals("PATIENT"))
+        if (!(user.getRole().equals("DOCTOR")))
             throw new ApiException("The doctor can't add a patient");
         else if (checkDoctor != null)
             throw new ApiException("This doctor already complete his/her information");
@@ -63,6 +67,10 @@ public class DoctorService {
         doctorRepository.save(doctor);
     }
     public void updateDoctor(Integer user_id,Integer id, DoctorDTO doctor){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("DOCTOR")))
+            throw new ApiException("Sorry only doctor can see this page");
+
         Doctor oldDoctor = doctorRepository.findDoctorById(id);
 
         if (oldDoctor == null)
@@ -79,6 +87,10 @@ public class DoctorService {
     }
 
     public void deleteDoctor(Integer user_id,Integer id){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("DOCTOR")))
+            throw new ApiException("Sorry only doctor can see this page");
+
         Doctor deleteDoctor = doctorRepository.findDoctorById(id);
 
         if (deleteDoctor == null)
@@ -90,6 +102,10 @@ public class DoctorService {
     }
 
     public Double bounsSalary(Integer user_id,Integer id){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("DOCTOR")))
+            throw new ApiException("Sorry only doctor can see this page");
+
         Doctor doctor = doctorRepository.findDoctorById(id);
         if (doctor == null)
             throw new ApiException("Sorry, doctor id is wrong");
@@ -107,20 +123,13 @@ public class DoctorService {
         return doctor.getSalary();
     }
 
-    public List<Doctor> getAllDoctorWithPosition(String position){
-        List<Doctor> doctors = doctorRepository.findDoctorByPosition(position);
-
-        if (doctors.isEmpty())
-            throw new ApiException("Sorry, the doctors with position '"+position+"' not found");
-
-        return doctors;
-    }
-
-
-
     // Insurance deduction from the doctor’s salary higher than 30,000
 
     public Double deductionSalary(Integer user_id,Integer id){
+        User user = authRepository.findUserById(user_id);
+        if (!(user.getRole().equals("DOCTOR")))
+            throw new ApiException("Sorry only doctor can see this page");
+
         Doctor doctor = doctorRepository.findDoctorById(id);
 
         if (doctor == null)
@@ -144,7 +153,6 @@ public class DoctorService {
     public Double doctorsAverageSalary(Integer user_id){
         User user = authRepository.findUserById(user_id);
 
-
         if (!(user.getRole().equals("DOCTOR")))
             throw new ApiException("Sorry, only doctor can see the average");
 
@@ -152,8 +160,4 @@ public class DoctorService {
 
         return avg;
     }
-
-
-
-
 }
