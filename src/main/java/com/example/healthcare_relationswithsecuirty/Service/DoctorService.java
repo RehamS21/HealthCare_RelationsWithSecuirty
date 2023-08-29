@@ -1,13 +1,18 @@
 package com.example.healthcare_relationswithsecuirty.Service;
 
 import com.example.healthcare_relationswithsecuirty.Api.ApiException;
+import com.example.healthcare_relationswithsecuirty.DTO.DoctorDTO;
 import com.example.healthcare_relationswithsecuirty.Model.Doctor;
+import com.example.healthcare_relationswithsecuirty.Model.User;
+import com.example.healthcare_relationswithsecuirty.Repository.AuthRepository;
 import com.example.healthcare_relationswithsecuirty.Repository.DoctorRepository;
 import com.example.healthcare_relationswithsecuirty.Repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.patterns.HandlerPointcut;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.util.List;
 
 @Service
@@ -15,18 +20,45 @@ import java.util.List;
 public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final AuthRepository authRepository;
 
-    public List<Doctor> getAllDoctor(){
-        return doctorRepository.findAll();
+    public void register(User user){
+        String hash = new BCryptPasswordEncoder().encode(user.getPassword());
+        user.setPassword(hash);
+        user.setRole("DOCTOR");
+        authRepository.save(user);
     }
-    public void addDoctor(Doctor doctor){
+
+    public Doctor getAllDoctor(Integer user_id){
+        Doctor doctor = doctorRepository.findDoctorById(user_id);
+        if (doctor == null)
+            throw new ApiException("Sorry you cant see info of this doctor");
+
+        return doctor;
+    }
+
+
+    public void addDoctor(Integer user_id , DoctorDTO doctorDTO){
+        User user = authRepository.findUserById(user_id);
+        Doctor doctor = new Doctor();
+        doctorDTO.setUser_id(user_id);
+
+        doctor.setId(doctorDTO.getUser_id());
+        doctor.setName(doctorDTO.getName());
+        doctor.setPhone(doctor.getPhone());
+        doctor.setPosition(doctorDTO.getPosition());
+        doctor.setSalary(doctorDTO.getSalary());
+        doctor.setUser(user);
+
         doctorRepository.save(doctor);
     }
-    public void updateDoctor(Integer id, Doctor doctor){
+    public void updateDoctor(Integer user_id,Integer id, DoctorDTO doctor){
         Doctor oldDoctor = doctorRepository.findDoctorById(id);
 
         if (oldDoctor == null)
             throw new ApiException("Doctor id is wrong");
+        else if (oldDoctor.getUser().getId() != user_id)
+            throw new ApiException("Sorry , you can't update ");
 
         oldDoctor.setName(doctor.getName());
         oldDoctor.setPhone(doctor.getPhone());
@@ -36,19 +68,23 @@ public class DoctorService {
         doctorRepository.save(oldDoctor);
     }
 
-    public void deleteDoctor(Integer id){
+    public void deleteDoctor(Integer user_id,Integer id){
         Doctor deleteDoctor = doctorRepository.findDoctorById(id);
 
         if (deleteDoctor == null)
             throw new ApiException("Sorry, the doctor id is wrong");
+        else if (deleteDoctor.getUser().getId() != user_id)
+            throw new ApiException("Sorry you can't delete this doctor");
 
         doctorRepository.delete(deleteDoctor);
     }
 
-    public Double bounsSalary(Integer id){
+    public Double bounsSalary(Integer user_id,Integer id){
         Doctor doctor = doctorRepository.findDoctorById(id);
         if (doctor == null)
             throw new ApiException("Sorry, doctor id is wrong");
+        else if (doctor.getUser().getId() != user_id)
+            throw new ApiException("Sorry you can't add bouns to this doctor");
 
         Integer countNumberOfPatient = patientRepository.numberOfPatient(id);
         if (countNumberOfPatient > 4){
@@ -70,26 +106,18 @@ public class DoctorService {
         return doctors;
     }
 
-    // return the higher salary of doctors
-
-    public Double higherSalary(){
-        Double doctorsalary = doctorRepository.getDoctorWithHigherSalary();
-
-        if (doctorsalary == 0)
-            throw new ApiException("Sorry the doctor not found");
-
-        return doctorsalary;
-    }
-
 
 
     // Insurance deduction from the doctor’s salary higher than 30,000
 
-    public Double deductionSalary(Integer id){
+    public Double deductionSalary(Integer user_id,Integer id){
         Doctor doctor = doctorRepository.findDoctorById(id);
 
         if (doctor == null)
             throw new ApiException("Sorry doctor id is wrong");
+        else if (doctor.getUser().getId() != user_id) {
+            throw new ApiException("Sorry you can't do this operation");
+        }
 
         doctor = doctorRepository.dudcationDoctorSalary(doctor.getId());
 
@@ -103,18 +131,13 @@ public class DoctorService {
 
         return result;
     }
+    public Double doctorsAverageSalary(Integer user_id){
+        User user = authRepository.findUserById(user_id);
 
 
-    public List<Doctor> DoctorOrderdByPostion(String position){
-        List<Doctor> doctors = doctorRepository.orderSalaryByPosition(position);
+        if (!(user.getRole().equals("DOCTOR")))
+            throw new ApiException("Sorry, only doctor can see the average");
 
-        if (doctors.isEmpty())
-            throw new ApiException("Sorry no doctors exist");
-
-        return doctors;
-    }
-
-    public Double doctorsAverageSalary(){
         Double avg = doctorRepository.doctorsAverageSalary();
 
         return avg;

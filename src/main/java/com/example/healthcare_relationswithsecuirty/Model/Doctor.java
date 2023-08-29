@@ -39,5 +39,10 @@ public class Doctor {
     @JsonIgnore
     private Set<Patient> patients;
 
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private User user;
+
 
 }

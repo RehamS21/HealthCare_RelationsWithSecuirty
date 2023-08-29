@@ -28,4 +28,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
     Double doctorsAverageSalary();
 
 
+
 }

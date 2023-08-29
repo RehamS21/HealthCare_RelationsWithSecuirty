@@ -15,7 +15,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class Patient {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotEmpty(message = "patient name must not null")
@@ -52,4 +52,18 @@ public class Patient {
     @JsonIgnore
     private Set<Bill> bills;
 
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private User user;
+
+    public Patient(Integer userId, String name, String phone, Integer age, Integer balance, Doctor doctor) {
+        this.setId(userId);
+        this.setName(name);
+        this.setAge(age);
+        this.setPhone(phone);
+        this.setBalance(balance);
+        this.setAppointment(false);
+        this.setDoctor(doctor);
+    }
 }

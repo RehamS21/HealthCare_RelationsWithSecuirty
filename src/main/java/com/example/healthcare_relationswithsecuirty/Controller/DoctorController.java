@@ -1,13 +1,16 @@
 package com.example.healthcare_relationswithsecuirty.Controller;
 
 import com.example.healthcare_relationswithsecuirty.Api.ApiResponse;
+import com.example.healthcare_relationswithsecuirty.DTO.DoctorDTO;
 import com.example.healthcare_relationswithsecuirty.Model.Doctor;
+import com.example.healthcare_relationswithsecuirty.Model.User;
 import com.example.healthcare_relationswithsecuirty.Service.DoctorService;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.Doc;
@@ -18,32 +21,38 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DoctorController {
     private final DoctorService doctorService;
+
+    @PostMapping("/register")
+    public ResponseEntity registerDoctor(@RequestBody @Valid User user){
+        doctorService.register(user);
+        return ResponseEntity.status(200).body(new ApiResponse("The doctor registered successfully"));
+    }
     @GetMapping("/get")
-    public ResponseEntity getAllDoctors(){
-        return ResponseEntity.status(200).body(doctorService.getAllDoctor());
+    public ResponseEntity getAllDoctors(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(doctorService.getAllDoctor(user.getId()));
     }
 
     @PostMapping("/add")
-    public ResponseEntity addNewDoctor(@RequestBody @Valid Doctor doctor){
-        doctorService.addDoctor(doctor);
+    public ResponseEntity addNewDoctor(@AuthenticationPrincipal User user,@RequestBody @Valid DoctorDTO doctor){
+        doctorService.addDoctor(user.getId(),doctor);
         return ResponseEntity.status(200).body(new ApiResponse("the doctor added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity updateDoctor(@PathVariable Integer id, @RequestBody @Valid Doctor doctor){
-        doctorService.updateDoctor(id,doctor);
+    public ResponseEntity updateDoctor(@AuthenticationPrincipal User user,@PathVariable Integer id, @RequestBody @Valid DoctorDTO doctor){
+        doctorService.updateDoctor(user.getId(),id,doctor);
         return ResponseEntity.status(200).body(new ApiResponse("the doctor updated info successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteDoctor(@PathVariable Integer id){
-        doctorService.deleteDoctor(id);
+    public ResponseEntity deleteDoctor(@AuthenticationPrincipal User user,@PathVariable Integer id){
+        doctorService.deleteDoctor(user.getId(), id);
         return ResponseEntity.status(200).body(new ApiResponse("The doctor deleted successfully"));
     }
 
     @PutMapping("/bouns/{id}")
-    public ResponseEntity addBouns(@PathVariable Integer id){
-        Double result = doctorService.bounsSalary(id);
+    public ResponseEntity addBouns(@AuthenticationPrincipal User user,@PathVariable Integer id){
+        Double result = doctorService.bounsSalary(user.getId(), id);
 
         return ResponseEntity.status(200).body(new ApiResponse("The salary after bouns = "+ result));
     }
@@ -55,28 +64,17 @@ public class DoctorController {
         return ResponseEntity.status(200).body(doctors);
     }
 
-    @GetMapping("/high")
-    public ResponseEntity getHighSalary(){
-        Double doctorSalary = doctorService.higherSalary();
-
-        return ResponseEntity.status(200).body(new ApiResponse("The high salary of doctors = "+doctorSalary));
-    }
 
     @PutMapping("/deduction/{id}")
-    public ResponseEntity deductionSalary(@PathVariable Integer id){
-        Double result = doctorService.deductionSalary(id);
+    public ResponseEntity deductionSalary(@AuthenticationPrincipal User user,@PathVariable Integer id){
+        Double result = doctorService.deductionSalary(user.getId(),id);
         return ResponseEntity.status(200).body(new ApiResponse("The salary after Insurance deduction = "+result));
     }
 
-    @GetMapping("/order/{position}")
-    public ResponseEntity orderDoctorsSalaryByPosition(@PathVariable String position){
-        List<Doctor> doctors = doctorService.DoctorOrderdByPostion(position);
-        return ResponseEntity.status(200).body(doctors);
-    }
 
     @GetMapping("/avg")
-    public ResponseEntity doctorsAvgSalary(){
-        return ResponseEntity.status(200).body(new ApiResponse("The doctors average salary ="+doctorService.doctorsAverageSalary()));
+    public ResponseEntity doctorsAvgSalary(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(new ApiResponse("The doctors average salary ="+doctorService.doctorsAverageSalary(user.getId())));
     }
 
 }
