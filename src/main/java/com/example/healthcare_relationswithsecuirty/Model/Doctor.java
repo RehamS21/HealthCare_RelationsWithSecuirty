@@ -16,7 +16,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class Doctor {
     @Id
-    @GeneratedValue( strategy = GenerationType.IDENTITY)
     private Integer id;
     @NotEmpty(message = "Doctor name must not null")
     @Column(columnDefinition = "varchar(20) not null")

@@ -45,8 +45,8 @@ public class DoctorService {
 
         doctor.setId(doctorDTO.getUser_id());
         doctor.setName(doctorDTO.getName());
-        doctor.setPhone(doctor.getPhone());
         doctor.setPosition(doctorDTO.getPosition());
+        doctor.setPhone(doctor.getPhone());
         doctor.setSalary(doctorDTO.getSalary());
         doctor.setUser(user);
 

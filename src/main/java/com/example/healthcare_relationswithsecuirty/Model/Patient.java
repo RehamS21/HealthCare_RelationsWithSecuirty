@@ -41,7 +41,7 @@ public class Patient {
     private Boolean appointment = false;
 
     @ManyToOne
-    @JoinColumn(name = "doctor_id" , referencedColumnName = "id")
+    @JoinColumn(name = "doctor_id" , referencedColumnName = "user_id")
     private Doctor doctor;
 
     @ManyToOne
@@ -57,13 +57,4 @@ public class Patient {
     @JsonIgnore
     private User user;
 
-    public Patient(Integer userId, String name, String phone, Integer age, Integer balance, Doctor doctor) {
-        this.setId(userId);
-        this.setName(name);
-        this.setAge(age);
-        this.setPhone(phone);
-        this.setBalance(balance);
-        this.setAppointment(false);
-        this.setDoctor(doctor);
-    }
 }

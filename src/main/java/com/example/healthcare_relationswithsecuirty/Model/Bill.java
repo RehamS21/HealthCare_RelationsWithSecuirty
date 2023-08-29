@@ -23,6 +23,6 @@ public class Bill {
     private Integer billprice;
 
     @ManyToOne
-    @JoinColumn(name = "patient_id", referencedColumnName = "id")
+    @JoinColumn(name = "patient_id", referencedColumnName = "user_id")
     private Patient patient;
 }
