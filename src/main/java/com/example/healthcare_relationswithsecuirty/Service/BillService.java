@@ -3,6 +3,8 @@ package com.example.healthcare_relationswithsecuirty.Service;
 import com.example.healthcare_relationswithsecuirty.Api.ApiException;
 import com.example.healthcare_relationswithsecuirty.Model.Bill;
 import com.example.healthcare_relationswithsecuirty.Model.Patient;
+import com.example.healthcare_relationswithsecuirty.Model.User;
+import com.example.healthcare_relationswithsecuirty.Repository.AuthRepository;
 import com.example.healthcare_relationswithsecuirty.Repository.BillRepository;
 import com.example.healthcare_relationswithsecuirty.Repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +16,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BillService {
     private final BillRepository billRepository;
-//    private final PatientService patientService;
     private final PatientRepository patientRepository;
+    private final AuthRepository authRepository;
 
-    public List<Bill> getAllBill(){
+    public List<Bill> getAllBill(Integer user_id){
+        User user = authRepository.findUserById(user_id);
+
+        if (!(user.getRole().equals("ADMIN")))
+            throw new ApiException("Sorry, only admin can see this page");
+
         return billRepository.findAll();
     }
 
-    public void addBill(Integer patient_id,Bill bill){
+    public void addBill(Integer user_id,Integer patient_id,Bill bill){
+        User user = authRepository.findUserById(user_id);
+
+        if (!(user.getRole().equals("ADMIN")))
+            throw new ApiException("Sorry, only admin can see this page");
+
         Patient patient = patientRepository.findPatientById(patient_id);
         if (patient == null)
             throw new ApiException("Sorry , the patient id is wrong");
@@ -30,7 +42,13 @@ public class BillService {
         billRepository.save(bill);
     }
 
-    public void updateBill(Integer id, Bill bill){
+    public void updateBill(Integer user_id,Integer id, Bill bill){
+        User user = authRepository.findUserById(user_id);
+
+        if (!(user.getRole().equals("ADMIN")))
+            throw new ApiException("Sorry, only admin can see this page");
+
+
         Bill oldBill = billRepository.findBillById(id);
 
         if (oldBill == null)
@@ -44,7 +62,12 @@ public class BillService {
 
 
 
-    public void deleteBill(Integer id){
+    public void deleteBill(Integer user_id,Integer id){
+        User user = authRepository.findUserById(user_id);
+
+        if (!(user.getRole().equals("ADMIN")))
+            throw new ApiException("Sorry, only admin can see this page");
+
         Bill deleteBill = billRepository.findBillById(id);
 
         if (deleteBill == null)
@@ -55,7 +78,12 @@ public class BillService {
     }
 
 
-    public Integer calculateBill(Integer billId){
+    public Integer calculateBill(Integer user_id,Integer billId){
+        User user = authRepository.findUserById(user_id);
+
+        if (!(user.getRole().equals("ADMIN")))
+            throw new ApiException("Sorry, only admin can see this page");
+
         Bill bill = billRepository.findBillById(billId);
         if (bill == null)
             throw new ApiException("bill id is wrong");
@@ -76,7 +104,12 @@ public class BillService {
 
 
     // discount the bill for children where age < 18
-    public Integer DiscountBill(Integer billId){
+    public Integer DiscountBill(Integer user_id,Integer billId){
+        User user = authRepository.findUserById(user_id);
+
+        if (!(user.getRole().equals("ADMIN")))
+            throw new ApiException("Sorry, only admin can see this page");
+
         Bill bill = billRepository.findBillById(billId);
         if (bill == null)
             throw new ApiException("Sorry the bill id is wrong");
@@ -93,6 +126,9 @@ public class BillService {
 
         return billDiscount;
     }
+
+
+    // no longer needed
 
     public void assignBillToPatient(Integer bill_id , Integer patient_id){
         Bill bill = billRepository.findBillById(bill_id);

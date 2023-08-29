@@ -31,7 +31,13 @@ public class PatientService {
 
     public void addPatient(Integer user_id,Integer doctor_id, PatientDTO patientDto){
         User user = authRepository.findUserById(user_id);
-        patientDto.setUser_id(user_id);
+        Patient checkPatient = patientRepository.findPatientById(user_id);
+
+        if (user.getRole().equals("DOCTOR"))
+            throw new ApiException("The doctor can't add a patient");
+        else if (checkPatient != null)
+            throw new ApiException("This patient already complete his/her information");
+
 
         Doctor doctor = doctorRepository.findDoctorById(doctor_id);
         if (doctor == null)
@@ -53,20 +59,21 @@ public class PatientService {
         patientRepository.save(patient);
     }
 
-    public void updatePatient(Integer user_id,Integer id, Patient patient){
-        Patient oldPatient = patientRepository.findPatientById(id);
+    public void updatePatient(Integer user_id, Integer patient_id,PatientDTO patientDTO){
+        Patient oldPatient = patientRepository.findPatientById(patient_id);
 
         if (oldPatient == null)
             throw new ApiException("Sorry, patient id is wrong");
-        else if (patient.getUser().getId() != user_id)
+        else if (oldPatient.getUser().getId() != user_id)
             throw new ApiException("Sorry you can't update the patient");
 
+        patientDTO.setUser_id(user_id);
 
-        oldPatient.setName(patient.getName());
-        oldPatient.setAge(patient.getAge());
-        oldPatient.setPhone(patient.getPhone());
-        oldPatient.setBalance(patient.getBalance());
-        oldPatient.setAppointment(patient.getAppointment());
+        oldPatient.setId(patientDTO.getUser_id());
+        oldPatient.setName(patientDTO.getName());
+        oldPatient.setAge(patientDTO.getAge());
+        oldPatient.setPhone(patientDTO.getPhone());
+        oldPatient.setBalance(patientDTO.getBalance());
 
 
         patientRepository.save(oldPatient);
@@ -80,11 +87,18 @@ public class PatientService {
         else if (deletePatient.getUser().getId() != user_id)
             throw new ApiException("Sorry you can't delete this patient");
 
-
+        deletePatient.setDoctor(null);
+        deletePatient.setUser(null);
+        deletePatient.setRoom(null);
         patientRepository.delete(deletePatient);
     }
 
     public void appointmentBooking(Integer user_id,Integer id){
+       User user = authRepository.findUserById(user_id);
+
+       if (user.getRole().equals("DOCTOR"))
+           throw new ApiException("Sorry, only the patient can do this operation");
+
         Patient patient = patientRepository.findPatientById(id);
 
         if (patient == null)
@@ -100,18 +114,9 @@ public class PatientService {
         patientRepository.save(patient);
     }
 
-    public List<Patient> getAllPatentWithAppointment(){
-        return patientRepository.getAllPatientWithAppintment();
-    }
-    public List<Patient> patientsOrdered(){
-        List<Patient> patients = patientRepository.orderPatientByMoney();
 
-        if (patients.isEmpty())
-            throw new ApiException("Sorry , No patients exist");
 
-        return patients;
-    }
-
+    // This method no longer needed becuase I assigned the doctor already in the addPatient method
     public void assignDoctorToPatient(Integer doctor_id, Integer patient_id){
         Doctor doctor = doctorRepository.findDoctorById(doctor_id);
         Patient patient = patientRepository.findPatientById(patient_id);
@@ -126,6 +131,11 @@ public class PatientService {
     }
 
     public void assignRoomToPatient(Integer user_id,Integer room_id , Integer patient_id){
+        User user = authRepository.findUserById(user_id);
+        if (user.getRole().equals("DOCTOR"))
+            throw new ApiException("Sorry, only the patient can do this operation");
+
+
         Room room = roomRepository.findRoomById(room_id);
         Patient patient = patientRepository.findPatientById(patient_id);
 
@@ -139,7 +149,5 @@ public class PatientService {
 
         patientRepository.save(patient);
     }
-
-
 
 }

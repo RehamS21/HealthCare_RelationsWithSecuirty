@@ -40,8 +40,18 @@ public class DoctorService {
 
     public void addDoctor(Integer user_id , DoctorDTO doctorDTO){
         User user = authRepository.findUserById(user_id);
+        Doctor checkDoctor = doctorRepository.findDoctorById(user_id);
+
+        if (user.getRole().equals("PATIENT"))
+            throw new ApiException("The doctor can't add a patient");
+        else if (checkDoctor != null)
+            throw new ApiException("This doctor already complete his/her information");
+
+
+
         Doctor doctor = new Doctor();
         doctorDTO.setUser_id(user_id);
+
 
         doctor.setId(doctorDTO.getUser_id());
         doctor.setName(doctorDTO.getName());

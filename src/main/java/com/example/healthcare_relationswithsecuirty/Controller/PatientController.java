@@ -35,7 +35,7 @@ public class PatientController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity updatePatient(@AuthenticationPrincipal User user,@PathVariable Integer id, @RequestBody @Valid Patient patient){
+    public ResponseEntity updatePatient(@AuthenticationPrincipal User user,@PathVariable Integer id, @RequestBody @Valid PatientDTO patient){
         patientService.updatePatient(user.getId(), id,patient);
         return ResponseEntity.status(200).body(new ApiResponse("the patient '"+patient.getName() +"' updated info successfully"));
     }
