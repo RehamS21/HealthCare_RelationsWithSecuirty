@@ -43,6 +43,8 @@ public class ConfigSecurity {
                 .requestMatchers("/api/v1/doctor/register").permitAll()
                 .requestMatchers("/api/v1/doctor/getAllDoctorPosition").hasAuthority("DOCTOR")
                 .requestMatchers("/api/v1/doctor/avg").hasAuthority("DOCTOR")
+                .requestMatchers("/api/v1/doctor/add").hasAuthority("DOCTOR")
+                .requestMatchers("/api/v1/doctor/add").hasAuthority("DOCTOR")
                 .anyRequest().authenticated()
                 .and()
                 .logout().logoutUrl("/api/v1/auth/logout")
