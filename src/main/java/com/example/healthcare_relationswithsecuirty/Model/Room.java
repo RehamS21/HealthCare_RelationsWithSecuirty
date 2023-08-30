@@ -20,8 +20,11 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+//    @NotEmpty(message = "the room type must not null")
+//    @Column(columnDefinition = "varchar(30) not null, check( roomtype = 'emergency' or roomtype ='intensive care' or roomtype = 'operating' or roomtype = 'hypnosis')")
+//    private String roomtype;
     @NotEmpty(message = "the room type must not null")
-    @Column(columnDefinition = "varchar(30) not null, check( roomtype = 'emergency' or roomtype ='intensive care' or roomtype = 'operating' or roomtype = 'hypnosis')")
+    @Column(columnDefinition = "varchar(30) not null")
     private String roomtype;
 
 

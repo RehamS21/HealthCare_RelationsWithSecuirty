@@ -20,9 +20,15 @@ public class Doctor {
     @NotEmpty(message = "Doctor name must not null")
     @Column(columnDefinition = "varchar(20) not null")
     private String name;
+//    @NotEmpty(message = "position must not null")
+//    @Column(columnDefinition = "varchar(20) not null, check(position = 'dentist' or position = 'general' or position = 'pediatrician')")
+//    private String position;
+//
     @NotEmpty(message = "position must not null")
-    @Column(columnDefinition = "varchar(20) not null, check(position = 'dentist' or position = 'general' or position = 'pediatrician')")
+    @Column(columnDefinition = "varchar(20) not null")
     private String position;
+
+
     @NotEmpty(message = "doctor phone number must not empty")
     // saudi phone number. reference : https://gist.github.com/homaily/8672499
     @Pattern(regexp = "^(009665|9665|\\+9665|05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$")

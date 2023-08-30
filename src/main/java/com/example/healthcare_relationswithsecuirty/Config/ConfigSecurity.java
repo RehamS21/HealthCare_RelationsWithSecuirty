@@ -19,14 +19,14 @@ public class ConfigSecurity {
     private final MyUserDetailsService myUserDetailsService;
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider=new
+    public DaoAuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider daoAuthenticationProvider1=new
                 DaoAuthenticationProvider();
 
-        authenticationProvider.setUserDetailsService(myUserDetailsService);
-        authenticationProvider.setPasswordEncoder(new
+        daoAuthenticationProvider1.setUserDetailsService(myUserDetailsService);
+        daoAuthenticationProvider1.setPasswordEncoder(new
                 BCryptPasswordEncoder());
-        return authenticationProvider;
+        return daoAuthenticationProvider1;
     }
 
     @Bean
@@ -37,7 +37,7 @@ public class ConfigSecurity {
 
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
-                .authenticationProvider(authenticationProvider())
+                .authenticationProvider( daoAuthenticationProvider())
                 .authorizeHttpRequests()
                 .requestMatchers("/api/v1/patient/register").permitAll()
                 .requestMatchers("/api/v1/doctor/register").permitAll()
