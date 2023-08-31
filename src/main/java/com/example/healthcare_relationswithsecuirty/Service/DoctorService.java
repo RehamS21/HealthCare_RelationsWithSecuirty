@@ -51,18 +51,14 @@ public class DoctorService {
         else if (checkDoctor != null)
             throw new ApiException("This doctor already complete his/her information");
 
-
-
         Doctor doctor = new Doctor();
         doctorDTO.setUser_id(user_id);
-
 
         doctor.setId(doctorDTO.getUser_id());
         doctor.setName(doctorDTO.getName());
         doctor.setPosition(doctorDTO.getPosition());
         doctor.setPhone(doctorDTO.getPhone());
         doctor.setSalary(doctorDTO.getSalary());
-        doctor.setUser(user);
 
         doctorRepository.save(doctor);
     }

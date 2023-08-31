@@ -4,7 +4,6 @@ import com.example.healthcare_relationswithsecuirty.Model.Doctor;
 import com.example.healthcare_relationswithsecuirty.Model.User;
 import com.example.healthcare_relationswithsecuirty.Repository.AuthRepository;
 import com.example.healthcare_relationswithsecuirty.Repository.DoctorRepository;
-import com.example.healthcare_relationswithsecuirty.Repository.PatientRepository;
 import com.example.healthcare_relationswithsecuirty.Service.DoctorService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,10 +67,4 @@ public class DoctorServiceTest {
         verify(doctorRepository,times(1)).doctorsAverageSalary();
         verify(authRepository, times(1)).findUserById(user.getId());
     }
-
     }
-
-
-
-
-
